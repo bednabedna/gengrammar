@@ -339,69 +339,26 @@ function createRules(rules) {
     return buff.join('\n')
 }
 
-const one = rule => ({
-    rule,
-    min: 1,
-    max: 1
-})
-const zeroOrOne = rule => ({
-    rule,
-    min: 0,
-    max: 1
-})
-const zeroOrMore = rule => ({
-    rule,
-    min: 0,
-    max: Infinity
-})
-const oneOrMore = rule => ({
-    rule,
-    min: 1,
-    max: Infinity
-})
+const one = rule => mergeCardinalities(rule, 1, 1)
+const zeroOrOne = rule => mergeCardinalities(rule, 0, 1)
+const zeroOrMore = rule => mergeCardinalities(rule, 0, Infinity)
+const oneOrMore = rule => mergeCardinalities(rule, 1, Infinity)
+
+function mergeCardinalities(rule, min, max) {
+    if (!rule.rule) {
+        return ({ rule, min, max })
+    }
+    return ({
+        rule: rule.rule,
+        min: rule.min * min,
+        max: rule.max * max
+    })
+}
 
 //---------------------------
 const fs = require("fs")
 const assert = require("assert")
 
-function test() {
-    const text = createRules({
-        "parseTest2": concat([one(isString("miao"))]),
-        "parseTest": concat([
-            one(isString("ciao")),
-            [ //OR
-                {
-                    rule: isInSet([isString("1"), isString("2"), isString("3")]),
-                    min: 1,
-                    max: 4
-                },
-                one(isString("cd")),
-                one(callFunc("parseTest2")),
-                one(isString("ef"))
-            ],
-            zeroOrMore(isString("!")),
-            one(isString("%")),
-        ])
-    });
-    fs.writeFileSync("test.js", text, "utf8")
-    const generated = require("./test")
-    const fullMatch = input => {
-        const out = []
-        const pos = generated.parseTest(input, out)
-        console.log(JSON.stringify(out))
-        assert(pos !== -1, "input not accepted")
-        assert(pos === input.length, "lengths don't match, got " + pos + " expected " + input.length)
-    }
-    fullMatch("ciao2!%")
-    fullMatch("ciaocd%")
-    fullMatch("ciaomiao%")
-    fullMatch("ciaocd!%")
-    fullMatch("ciaomiao!!!!%")
-    fullMatch("ciaoef!!!%")
-    assert(generated.parseTest("cia") === -1)
-    assert(generated.parseTest("ciao%?") === "ciao%".length)
-    console.log("Test passed.")
-}
 
 function rulesParser() {
     const spaces = zeroOrMore(isEscape("s"))
@@ -424,6 +381,28 @@ function rulesParser() {
             ]),
             one(isChar('"')),
         ]),
+        // "[^" ( escape | [^\]] )+ ]     TODO: ranges
+        "nset": concat([
+            one(isString('[^')),
+            oneOrMore([
+                [ //OR 
+                    one(callFunc("escape")),
+                    one(isNotInSet([isChar(']')]))
+                ]
+            ]),
+            one(isChar(']')),
+        ]),
+        // "[" ( escape | [^\]] )+ ]     TODO: ranges
+        "set": concat([
+            one(isChar('[')),
+            oneOrMore([
+                [ //OR 
+                    one(callFunc("escape")),
+                    one(isNotInSet([isChar(']')]))
+                ]
+            ]),
+            one(isChar(']')),
+        ]),
         // "[?*+]"
         "card": concat([one(isInSet([isChar("?"), isChar("*"), isChar("+")]))]),
         // ((par|escape|str|ident)\s*card?\s*)+
@@ -432,6 +411,8 @@ function rulesParser() {
                 one(callFunc("par")),
                 one(callFunc("escape")),
                 one(callFunc("str")),
+                one(callFunc("nset")),
+                one(callFunc("set")),
                 one(callFunc("ident")),
             ],
             spaces,
@@ -515,7 +496,7 @@ function compileRule(rule) {
         case "or":
             if (rule.children === 1)
                 return compileRule(rule.children[0])
-            return [compileAnd(rule.children)]
+            return [[compileAnd(rule.children)]]
         case "str":
             const str = JSON.parse(rule.text)
             if (str.length === 1)
@@ -526,6 +507,14 @@ function compileRule(rule) {
             return one(callFunc(rule.text))
         case "escape":
             return one(isEscape(rule.text[1]))
+        case "nset":
+            // TODO: ranges are not yet handled here...
+            const inNSetChars = rule.text.substring(2, rule.text.length - 1).split('').map(isChar)
+            return one(isNotInSet(inNSetChars))
+        case "set":
+            // TODO: ranges are not yet handled here...
+            const inSetChars = rule.text.substring(1, rule.text.length - 1).split('').map(isChar)
+            return one(isInSet(inSetChars))
         case "card":
             return rule
         default:
@@ -567,8 +556,7 @@ function compileRules(rules) {
         assert(rule.name, "rule")
         assert(rule.children.length === 2)
         const ruleName = rule.children[0].text
-        const ruleBody = rule.children[1]
-        assert(ruleBody.name === "and")
+        let ruleBody = rule.children[1]
         const compiled = compileAnd(ruleBody.children)
         assert(compiled.length)
         compiledRules[ruleName] = concat(compiled)
@@ -577,7 +565,7 @@ function compileRules(rules) {
 }
 
 function parseRules(outfile, input) {
-    fs.writeFileSync("parser.js", rulesParser(), "utf8")
+    fs.writeFileSync("./generated/parser.js", rulesParser(), "utf8")
     const parser = require("./parser")
     const out = []
     const pos = parser.rules(input, out)
@@ -588,14 +576,24 @@ function parseRules(outfile, input) {
     fs.writeFileSync(outfile, compileRules(rules), "utf8")
 }
 
-//test()
-///*
-parseRules("test.js", 'id  = sigla \\s* num; sigla = ("RM" |"MI"|"RN")+ "AS"; num = \\d+;')
-const generated = require("./test")
-const input = "RNRMAS324"
+
+parseRules(
+    "./generated/test.js",
+    `
+    JSON = \\s* (NULL | BOOL | NUMBER | STRING | LIST | OBJECT) \\s*;
+    NULL = "null";
+    BOOL = "true" | "false";
+    NUMBER = ("0" | \\d+) ("." \\d+)?;
+    STRING = "\\"" [^"]* "\\"";
+    LIST = "[" \\s* (JSON ("," JSON)* )?  \\s*  "]";
+    OBJECT = "{" \\s* (STRING \\s* ":" \\s* JSON ("," \\s* STRING \\s* ":" \\s* JSON )* )?  \\s*  "}";
+    `
+)
+const generated = require("./generated/test")
+console.log("----------------------")
+const input = '{"chiave": 123, "lista": [null, ["annidata", 2.0]]}'
 const out = []
-const pos = generated.id(input, out)
+const pos = generated.JSON(input, out)
 assert(pos !== -1, "input not accepted")
 assert(pos === input.length, "input not fully consumed (" + pos + "/" + input.length + ")")
 console.log(JSON.stringify(out, null, 3))
-//*/
