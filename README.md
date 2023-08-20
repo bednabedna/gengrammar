@@ -15,7 +15,7 @@ The function is able to parse the grammar description `input` because it generat
 ```js
 function parseRules(outfile, input) {
     fs.writeFileSync("./generated/parser.js", rulesParser(), "utf8")
-    const parser = require("./parser")
+    const parser = require("./generated/parser")
     const out = []
     const pos = parser.rules(input, out)
     console.log(JSON.stringify(out, null, 3))
