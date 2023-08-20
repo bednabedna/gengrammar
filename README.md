@@ -49,7 +49,8 @@ Now that we have generated in `/generated/test.js` the JSON language grammar par
 const generated = require("./generated/test")
 const input = '{"chiave": 123, "lista": [null, ["annidata", 2.0]]}'
 const out = []
-const pos = generated.JSON(input, out) // generated.JSON is the generated function corresponding to the "JSON" rule of our JSON grammar
+// generated.JSON is the generated function corresponding to the "JSON" rule of our JSON grammar
+const pos = generated.JSON(input, out)
 assert(pos !== -1, "input not accepted")
 assert(pos === input.length, "input not fully consumed (" + pos + "/" + input.length + ")")
 console.log(JSON.stringify(out, null, 3))
