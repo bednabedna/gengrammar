@@ -24,7 +24,7 @@ function parseGrammar(filePath, grammar) {
         const { writeGrammarDefinition } = require('./grammar-definition')
         // We create the file containing the parser for a grammar definition
         writeGrammarDefinition()
-        // this time the import should succede
+        // this time the import should succeed
         grammarParser = require('./generated/grammar-parser')
     }
     // Now we use the imported parser to parse the grammar definition in input (a string)
