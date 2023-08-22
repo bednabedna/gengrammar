@@ -4,7 +4,7 @@ const fs = require('fs')
 function parseGrammar(filePath, grammar) {
     let grammarParser = null
     try {
-        // try to import the genrated parser
+        // try to import the generated parser
         grammarParser = require('./generated/grammar-parser')
     } catch (e) {
         if (e.code !== 'MODULE_NOT_FOUND')
@@ -12,18 +12,18 @@ function parseGrammar(filePath, grammar) {
         // We did not have already generated the parser
         console.log("Generate grammar parser")
         const { writeGrammarDefinition } = require('./grammar-definition')
-        // We generate the file with the js code that parses a grammar definition 
+        // We create the file containing the parser for a grammar definition
         writeGrammarDefinition()
         // this time the import should succede
         grammarParser = require('./generated/grammar-parser')
     }
-    // Now we use the imported generated parser to parse the grammar definition (a string)
+    // Now we use the imported parser to parse the grammar definition in input (a string)
     const match = grammarParser.rules(grammar)
     // This prints some infos about the result
     checkMatch(match, grammar)
     if (match.end < grammar.length)
         return // no match, grammar wasn't a valid grammar definition
-    // We print the xml tree representing the parse tree (you can find it in xml/json-grammar.xml)
+    // We print the xml tree representing the parse tree (you can find an example in xml/json-grammar.xml)
     console.log(matchToXml(match, grammar), "\n\n")
     // Now we compile the matched grammar to javascript
     let jsCode = compileGrammarMatch(match, grammar)
@@ -92,7 +92,7 @@ const jsonGrammar = parseGrammar(
     OBJECT = "{" (KEY ":" JSON ("," KEY ":" JSON )* )? "}";
     `
 )
-// Now we'll try our JSON parser on the input 
+// Next, we will proceed to apply our JSON parser to the given input. 
 const input = '{"chiave": 123, "lista": [null, ["annidata", 2.0], true]}'
 const match = jsonGrammar.JSON(input)
 

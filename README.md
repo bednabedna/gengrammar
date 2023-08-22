@@ -22,7 +22,7 @@ function parseGrammar(filePath, grammar) {
         // We did not have already generated the parser
         console.log("Generate grammar parser")
         const { writeGrammarDefinition } = require('./grammar-definition')
-        // We generate the file with parser of a grammar definition 
+        // We create the file containing the parser for a grammar definition
         writeGrammarDefinition()
         // this time the import should succede
         grammarParser = require('./generated/grammar-parser')
@@ -65,7 +65,7 @@ const jsonGrammar = parseGrammar(
 Now that we have generated in `/generated/json-grammar.js` the JSON language parser, we can use it to parse the JSON formatted string `'{"chiave": 123, "lista": [null, ["annidata", 2.0], true]}'`.
 
 ```js
-// Now we'll try our JSON parser on the input 
+// Next, we will proceed to apply our JSON parser to the given input. 
 const input = '{"chiave": 123, "lista": [null, ["annidata", 2.0], true]}'
 const match = jsonGrammar.JSON(input)
 // Print infos about the match
@@ -145,7 +145,7 @@ if (a = (match123 !== null)) {
     pos += match123.end - match123.start
     children.push(match123)
 }
-// Char predicates are predicates that can advance only by one char (it allows them to be used in sets and negative sets)
+// Char predicates are predicates that can advance only by one char (it allows them to be combined in sets and negative sets)
 if (a = (input.charAt(pos) === 33 || input.charAt(pos) === 34)) {
     pos += 1
 }
