@@ -75,7 +75,7 @@ if (!match || match.end < input.length)
 // The corresponding xml tree can be found at xml/json.match.xml
 console.log(matchToXml(match, input))
 ```
-The parsed result of `'{"chiave": 123, "lista": [null, ["annidata", 2.0], true]}'` within the `match` variable consists of a hierarchical arrangement of match objects. Each of these objects stands for a rule that has matched the input. In these objects, the "name" attribute designates the name of the corresponding rule that achieved the match, while the `start` attribute denotes the starting index of the matched substring, the `end` attribute indicates the endpoint, and the `children` attribute contains the rules that have been matched and are associated with the parent rule.
+The parsed result of `'{"chiave": 123, "lista": [null, ["annidata", 2.0], true]}'` within the `match` variable consists of a hierarchical arrangement of match objects. Each of these objects stands for a rule that has matched the input. In these objects, the `name` attribute designates the name of the corresponding rule that achieved the match, while the `start` attribute denotes the starting index of the matched substring, the `end` attribute indicates the endpoint, and the `children` attribute contains the rules that have been matched and are associated with the parent rule.
 
 For instance, the rule `LIST` has its constituent items as children, the rule `OBJECT` has its keys and values as children, and the rule `NUMBER` is a submatch nested within the `JSON` rule. Given the structure of this grammar representation, the keys (`KEY`) and values (`JSON`) of the object alternate with each other within the children array.
 
