@@ -146,7 +146,7 @@ if (a = (match123 !== null)) {
     children.push(match123)
 }
 // Char predicates are predicates that can advance only by one char (it allows them to be combined in sets and negative sets)
-if (a = (input.charAt(pos) === 33 || input.charAt(pos) === 34)) {
+if (a = (input.charCodeAt(pos) === 33 || input.charCodeAt(pos) === 34)) {
     pos += 1
 }
 ```
@@ -199,7 +199,7 @@ if (!a) {
     children.length = prevChildLen123
 }
 ```
-Given the expections on predicates to reset the positions, we can expand any of the predicates in the example code and all the assumptions should hold (aside from the children length that is not rolled back in some cases of failure of an "and" inside an "or"). For additional instances of predicates, you can explore the generated code within the `/generated` directory. 
+Given the expections on predicates to reset the positions, we can expand any of the predicates in the example code and all the assumptions should hold. For additional instances of predicates, you can explore the generated code within the `/generated` directory. 
 
 ## Concluding Remarks on the Code
 The presented code exemplifies a personal, compact coding project that I undertook to delve into an intriguing concept. It's worth noting that this endeavor is purely exploratory in nature. It lacks the optimization that comes with algorithmic refinement and hasn't undergone rigorous testing. It's my intention that this project isn't misconstrued as a representation of my professional coding standards. Ordinarily, I adhere to established code conventions and rigorously test my code for robustness.
@@ -209,4 +209,4 @@ Should you wish to explore my other GitHub projects, I welcome your curiosity. N
 Engaging in this project was immensely enjoyable, and I believe it reflects my genuine enthusiasm for delving into diverse computer science concepts during my leisure time.
 
 ## Todos (not comprehensive)
-Implement ranges in sets (e.g [a-z0-9]) and "." special character for the match compilation, introduce loop special cases and optimizazions, handle children length reset in some edge cases, add tests.
+Implement ranges in sets (e.g [a-z0-9]) and "." special character for the match compilation, introduce loop special cases and optimizazions, handle pos reset in some edge case, add tests.
