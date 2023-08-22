@@ -209,4 +209,4 @@ Should you wish to explore my other GitHub projects, I welcome your curiosity. N
 Engaging in this project was immensely enjoyable, and I believe it reflects my genuine enthusiasm for delving into diverse computer science concepts during my leisure time.
 
 ## Todos (not comprehensive)
-Implement ranges in sets (e.g [a-z0-9]) and "." special character for the match compilation, introduce loop special cases and optimizazions, handle pos reset in some edge case, add tests.
+Implement ranges in sets (e.g [a-z0-9]) and "." special character for the match compilation, introduce loop special cases and optimizazions, handle pos reset in some edge cases, add tests.
