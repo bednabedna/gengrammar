@@ -1,6 +1,6 @@
 # gengrammar
 
-This JavaScript code generator creates parsers according to a [context-free grammar](https://en.wikipedia.org/wiki/Context-free_grammar) description in input. Context-free grammars are more powerful than regular expressions as they can recognize [context-free languages](https://en.wikipedia.org/wiki/Context-free_language). This code generator enhances context-free grammars with regex-like syntax, introducing escape sequences and cardinalities (?, *, +) to increase expressive capabilities.
+This JavaScript code generator creates parsers according to a [context-free grammar](https://en.wikipedia.org/wiki/Context-free_grammar) description in input. Context-free grammars are more powerful than regular expressions as they can recognize [context-free languages](https://en.wikipedia.org/wiki/Context-free_language). This code generator enhances context-free grammars with regex-like syntax, introducing escape sequences (`\w`, `\n`, `\"`) and cardinalities (`?`, `*`, `+`) to increase expressive capabilities.
 
 The grammar can be describe by composing function calls or by a string that defines it. The files generated after executing the `index.js`, can be found in the `/generated` folder. This allows you to review the generated code without needing to run it. Notably, this project remains free from any external dependencies.
 
@@ -75,9 +75,9 @@ if (!match || match.end < input.length)
 // The corresponding xml tree can be found at xml/json.match.xml
 console.log(matchToXml(match, input))
 ```
-The parsed result of `'{"chiave": 123, "lista": [null, ["annidata", 2.0], true]}'` within the `match` variable consists of a hierarchical arrangement of match objects. Each of these objects stands for a rule that has matched the input. In these objects, the "name" attribute designates the name of the corresponding rule that achieved the match, while the "start" attribute denotes the starting index of the matched substring, the "end" attribute indicates the endpoint, and the "children" attribute contains the rules that have been matched and are associated with the parent rule.
+The parsed result of `'{"chiave": 123, "lista": [null, ["annidata", 2.0], true]}'` within the `match` variable consists of a hierarchical arrangement of match objects. Each of these objects stands for a rule that has matched the input. In these objects, the "name" attribute designates the name of the corresponding rule that achieved the match, while the `start` attribute denotes the starting index of the matched substring, the `end` attribute indicates the endpoint, and the `children` attribute contains the rules that have been matched and are associated with the parent rule.
 
-For instance, the rule "LIST" has its constituent items as children, the rule "OBJECT" has its keys and values as children, and the rule "NUMBER" is a submatch nested within the "JSON" rule. Given the structure of this grammar representation, the keys ("KEY") and values ("JSON") of the object alternate with each other within the children array.
+For instance, the rule `LIST` has its constituent items as children, the rule `OBJECT` has its keys and values as children, and the rule `NUMBER` is a submatch nested within the `JSON` rule. Given the structure of this grammar representation, the keys (`KEY`) and values (`JSON`) of the object alternate with each other within the children array.
 
 The following represents the output of `matchToXml(match, input)` to the console (with the `checkMatch` output omitted):
 
@@ -132,7 +132,7 @@ The following represents the output of `matchToXml(match, input)` to the console
 ## Translation Process from Predicate Tree to JavaScript Code
 The mechanism responsible for orchestrating the translation from a predicate tree into JavaScript code resides within the `grammar.js` file. To offer a concise overview, I'll provide a brief outline, given the extensive nature of the explanation. Each grammar rule is paired with a corresponding function, where every function incorporates two core variables: `a` (a boolean) that signifies whether the input is accepted, and `pos` that tracks the consumed input.
 
-The system uses various predicates, which encapsulate a range of operations such as matching strings, matching individual characters, loops, logical "and" operations, and logical "or" operations. Whenever these predicates consume portions of the input, they switch the value of a to true and advance the `pos` variable accordingly. It's essential to note that each predicate ensures that, in the event of a failure, the `pos` variable is reset to its previous state. Here are some examples of simple predicates that consume input:
+The system uses various predicates, which encapsulate a range of operations such as matching strings, matching individual characters, loops, logical "and" operations, and logical "or" operations. Whenever these predicates consume portions of the input, they switch the value of `a` to true and advance the `pos` variable accordingly. It's essential to note that each predicate ensures that, in the event of a failure, the `pos` variable is reset to its previous state. Here are some examples of simple predicates that consume input:
 
 ```js
 // it does not mutate pos unless it accepts the input
@@ -207,11 +207,11 @@ if (!a) {
     children.length = prevChildLen123
 }
 ```
-Given the expections on predicates to reset the positions, we can replace A, B, C with any of the predicates in the example code and all the assumptions should hold. For additional instances of predicates, you can explore the generated code within the `/generated` directory. 
+Given the expections on predicates to reset the positions, we can replace `A`, `B`, `C` with any of the predicates in the example code and all the assumptions should hold. For additional instances of predicates, you can explore the generated code within the `/generated` directory. 
 
 ## Concluding Remarks on the Code
 The presented code exemplifies a personal, compact coding project that I undertook to delve into an intriguing concept. It's worth noting that this endeavor is purely exploratory in nature. It lacks the optimization that comes with algorithmic refinement and hasn't undergone rigorous testing. It's my intention that this project isn't misconstrued as a representation of my professional coding standards. Ordinarily, I adhere to established code conventions and rigorously test my code for robustness.
 
 Should you wish to explore my other GitHub projects, I welcome your curiosity. Nonetheless, I'd like to reiterate a caveat: while you're welcome to peruse my projects, including those shared here, it's important to consider that certain projects were developed several years ago. Furthermore, certain projects were made available primarily for interview purposes. The majority of my code is either private or not suitable for public presentation.
 
-Engaging in this project was immensely enjoyable, and I believe it reflects my genuine enthusiasm for delving into diverse computer science concepts during my leisure time.
+Engaging in this project was immensely enjoyable, and I believe it reflects my genuine enthusiasm for delving into diverse computer science concepts.
