@@ -30,7 +30,7 @@ function writeGrammarDefinition() {
             )),
             isChar('"')
         ),
-        // "[" ( escape | [^\]] )+ ]     TODO: ranges
+        // "[" "^"? ( escape | range | char)+ ]
         "set": and(
             isChar('['),
             zeroOrOne(isChar('^')),
