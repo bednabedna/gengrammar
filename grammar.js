@@ -25,6 +25,10 @@ class GroupPredicate extends Predicate {
 
 class AndPredicate extends GroupPredicate {
     writeJs(buffer) {
+        const prevPos = newVar('prevPos')
+        const prevChildLen = newVar("prevChildLen")
+        buffer.push('let ', prevPos, ' = pos\n')
+        buffer.push('let ', prevChildLen, ' = children.length\n')
         this.children[0].writeJs(buffer)
         buffer.push('\n')
         for (let i = 1; i < this.children.length; ++i) {
@@ -34,6 +38,10 @@ class AndPredicate extends GroupPredicate {
         for (let i = 1; i < this.children.length; ++i) {
             buffer.push('\n}\n')
         }
+        buffer.push(`if(!a) {
+            pos = ${prevPos}   
+            children.length = ${prevChildLen}   
+        }`)
     }
 }
 
@@ -65,24 +73,38 @@ class LoopPredicate extends Predicate {
         this.max = max
     }
     writeJs(buffer) {
+        if (this.min === 0 && this.max === 1) {
+            this.predicate.writeJs(buffer)
+            buffer.push('\na = true\n')
+            return
+        }
         const c = newVar("c")
         const prevPos = newVar("prevPos")
         const prevChildLen = newVar("prevChildLen")
-        buffer.push(
-            `let ${c} = 0
-            let ${prevPos} = pos
-            let ${prevChildLen} = children.length
-            do {
-        `)
+        buffer.push('\nlet ', c, ' = 0\n')
+        if (this.min !== 0) {
+            buffer.push('let ', prevPos, ' = 0\n')
+            buffer.push('let ', prevChildLen, ' = 0\n')
+        }
+        buffer.push('do {\n')
         this.predicate.writeJs(buffer)
-        buffer.push(`
-            } while (a && ++${c} < ${this.max});
-            a = ${c} >= ${this.min}
-            if (!a) {
-                pos = ${prevPos}
-                children.length = ${prevChildLen}
-            }
-        `)
+        if (this.max !== Infinity) {
+            buffer.push('} while (a && ++', c, ' < ', this.max, ');\n')
+        } else {
+            buffer.push('} while (a && ++', c, ');\n')
+        }
+        if (this.min === 0) {
+            buffer.push('\na = true\n')
+        } else {
+            buffer.push(`
+                a = ${c} >= ${this.min}
+                if (!a) {
+                    pos = ${prevPos}
+                    children.length = ${prevChildLen}
+                }
+            `)
+        }
+
     }
 }
 
@@ -253,20 +275,32 @@ exports.isRule = function (ruleName) {
     return new RuleCallPredicate(ruleName)
 }
 
-exports.andList = function (predicates) {
+function andList(predicates) {
+    if (predicates.length === 1) {
+        if (!(predicates[0] instanceof Predicate))
+            throw "expected predicate"
+        return predicates[0]
+    }
     return new AndPredicate(predicates)
 }
+exports.andList = andList
 
 exports.and = function () {
-    return new AndPredicate([...arguments])
+    return andList([...arguments])
 }
 
-exports.orList = function (predicates) {
+function orList(predicates) {
+    if (predicates.length === 1) {
+        if (!(predicates[0] instanceof Predicate))
+            throw "expected predicate"
+        return predicates[0]
+    }
     return new OrPredicate(predicates)
 }
+exports.orList = orList
 
 exports.or = function () {
-    return new OrPredicate([...arguments])
+    return orList([...arguments])
 }
 
 exports.zeroOrOne = function (predicate) {

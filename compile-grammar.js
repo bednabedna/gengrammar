@@ -34,6 +34,8 @@ function compilePredicate(predicate, input) {
             if (text.length === 1)
                 return isChar(text)
             return isString(text)
+        case "anychar":
+            return isAnyChar()
         case "escape":
             const char = input.substring(predicate.start + 1, predicate.end)
             if (char.length !== 1)
@@ -41,14 +43,21 @@ function compilePredicate(predicate, input) {
             return isEscape(input.substring(predicate.start + 1, predicate.end))
         case "ident":
             return isRule(input.substring(predicate.start, predicate.end))
-        case "nset":
-            // TODO: ranges are not yet handled here...
-            const inNSetChars = input.substring(predicate.start + 2, predicate.end - 1).split('').map(isChar)
-            return isNotInSetList(inNSetChars)
         case "set":
-            // TODO: ranges are not yet handled here...
-            const inSetChars = input.substring(predicate.start + 2, predicate.end - 1).split('').map(isChar)
-            return isInSetList(inSetChars)
+            const negative = input.charAt(predicate.start + 1) === "^"
+            const inSetPredicates = predicate.children.map(child => {
+                switch (child.name) {
+                    case 'escape':
+                        return isEscape(input.substring(child.start + 1, child.end))
+                    case 'range': // . "-" .
+                        return isInRange(input.substring(child.start, child.end - 2), input.substring(child.start + 2, child.end))
+                    case 'char':
+                        return isChar(input.substring(child.start, child.end))
+                    default:
+                        throw "unexpected set predicate " + JSON.stringify(child.name)
+                }
+            })
+            return isInSetList(inSetPredicates, negative)
         case "par":
             if (predicate.children.length === 1)
                 return compilePredicate(predicate.children[0], input)
@@ -56,7 +65,7 @@ function compilePredicate(predicate, input) {
                 throw "expected par to have 2 children max"
             return compileCardinality(compilePredicate(predicate.children[0], input), predicate.children[1], input)
         default:
-            throw "unknwon predicate " + JSON.stringify(predicate.name)
+            throw "unknown predicate " + JSON.stringify(predicate.name)
     }
 }
 

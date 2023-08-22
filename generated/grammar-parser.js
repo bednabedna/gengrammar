@@ -3,6 +3,8 @@ function escape(text, pos = 0) {
     let start = pos
     let a = true
     let children = []
+    let prevPos1 = pos
+    let prevChildLen2 = children.length
     if (a = /* char predicate */ (/* char "\\" */ text.charCodeAt(pos) === 92)) {
         pos += 1
     }
@@ -13,10 +15,32 @@ function escape(text, pos = 0) {
         }
 
     }
-
+    if (!a) {
+        pos = prevPos1
+        children.length = prevChildLen2
+    }
     if (a) {
         return ({
             name: "escape",
+            start,
+            end: pos,
+            children
+        })
+    }
+    return null
+}
+exports.anychar = anychar
+function anychar(text, pos = 0) {
+    let start = pos
+    let a = true
+    let children = []
+    if (a = /* char predicate */ (/* char "." */ text.charCodeAt(pos) === 46)) {
+        pos += 1
+    }
+
+    if (a) {
+        return ({
+            name: "anychar",
             start,
             end: pos,
             children
@@ -29,28 +53,28 @@ function ident(text, pos = 0) {
     let start = pos
     let a = true
     let children = []
+    let prevPos3 = pos
+    let prevChildLen4 = children.length
     if (a = /* char predicate */ (/* set */ (/* range from "a" to "z" */ text.charCodeAt(pos) >= 97 && text.charCodeAt(pos) <= 122 || /* range from "A" to "Z" */ text.charCodeAt(pos) >= 65 && text.charCodeAt(pos) <= 90 || /* char "_" */ text.charCodeAt(pos) === 95 || /* char "$" */ text.charCodeAt(pos) === 36))) {
         pos += 1
     }
 
     if (a) {
-        let c1 = 0
-        let prevPos2 = pos
-        let prevChildLen3 = children.length
+
+        let c5 = 0
         do {
             if (a = /* char predicate */ (/* set */ (/* range from "a" to "z" */ text.charCodeAt(pos) >= 97 && text.charCodeAt(pos) <= 122 || /* range from "A" to "Z" */ text.charCodeAt(pos) >= 65 && text.charCodeAt(pos) <= 90 || /* range from "0" to "9" */ text.charCodeAt(pos) >= 48 && text.charCodeAt(pos) <= 57 || /* char "_" */ text.charCodeAt(pos) === 95 || /* char "$" */ text.charCodeAt(pos) === 36))) {
                 pos += 1
             }
+        } while (a && ++c5);
 
-        } while (a && ++c1 < Infinity);
-        a = c1 >= 0
-        if (!a) {
-            pos = prevPos2
-            children.length = prevChildLen3
-        }
+        a = true
 
     }
-
+    if (!a) {
+        pos = prevPos3
+        children.length = prevChildLen4
+    }
     if (a) {
         return ({
             name: "ident",
@@ -66,15 +90,18 @@ function str(text, pos = 0) {
     let start = pos
     let a = true
     let children = []
+    let prevPos8 = pos
+    let prevChildLen9 = children.length
     if (a = /* char predicate */ (/* char "\"" */ text.charCodeAt(pos) === 34)) {
         pos += 1
     }
 
     if (a) {
-        let c4 = 0
-        let prevPos5 = pos
-        let prevChildLen6 = children.length
+
+        let c10 = 0
         do {
+            let prevPos13 = pos
+            let prevChildLen14 = children.length
             if (a = /* char predicate */ (/* char "\\" */ text.charCodeAt(pos) === 92)) {
                 pos += 1
             }
@@ -85,20 +112,19 @@ function str(text, pos = 0) {
                 }
 
             }
-
+            if (!a) {
+                pos = prevPos13
+                children.length = prevChildLen14
+            }
             if (!a) {
                 if (a = /* char predicate */ (/* nset */ pos < text.length && !(/* char "\"" */ text.charCodeAt(pos) === 34))) {
                     pos += 1
                 }
 
             }
+        } while (a && ++c10);
 
-        } while (a && ++c4 < Infinity);
-        a = c4 >= 0
-        if (!a) {
-            pos = prevPos5
-            children.length = prevChildLen6
-        }
+        a = true
         if (a) {
             if (a = /* char predicate */ (/* char "\"" */ text.charCodeAt(pos) === 34)) {
                 pos += 1
@@ -107,62 +133,13 @@ function str(text, pos = 0) {
         }
 
     }
-
+    if (!a) {
+        pos = prevPos8
+        children.length = prevChildLen9
+    }
     if (a) {
         return ({
             name: "str",
-            start,
-            end: pos,
-            children
-        })
-    }
-    return null
-}
-exports.nset = nset
-function nset(text, pos = 0) {
-    let start = pos
-    let a = true
-    let children = []
-    if (a = /* string */ text.startsWith("[^", pos)) {
-        pos += 2
-    }
-
-    if (a) {
-        let c7 = 0
-        let prevPos8 = pos
-        let prevChildLen9 = children.length
-        do {
-            let match10 = escape(text, pos)
-            if (a = (match10 !== null)) {
-                pos += match10.end - match10.start
-                children.push(match10)
-            }
-
-            if (!a) {
-                if (a = /* char predicate */ (/* nset */ pos < text.length && !(/* char "]" */ text.charCodeAt(pos) === 93))) {
-                    pos += 1
-                }
-
-            }
-
-        } while (a && ++c7 < Infinity);
-        a = c7 >= 1
-        if (!a) {
-            pos = prevPos8
-            children.length = prevChildLen9
-        }
-        if (a) {
-            if (a = /* char predicate */ (/* char "]" */ text.charCodeAt(pos) === 93)) {
-                pos += 1
-            }
-
-        }
-
-    }
-
-    if (a) {
-        return ({
-            name: "nset",
             start,
             end: pos,
             children
@@ -175,46 +152,126 @@ function set(text, pos = 0) {
     let start = pos
     let a = true
     let children = []
+    let prevPos15 = pos
+    let prevChildLen16 = children.length
     if (a = /* char predicate */ (/* char "[" */ text.charCodeAt(pos) === 91)) {
         pos += 1
     }
 
     if (a) {
-        let c11 = 0
-        let prevPos12 = pos
-        let prevChildLen13 = children.length
-        do {
-            let match14 = escape(text, pos)
-            if (a = (match14 !== null)) {
-                pos += match14.end - match14.start
-                children.push(match14)
-            }
+        if (a = /* char predicate */ (/* char "^" */ text.charCodeAt(pos) === 94)) {
+            pos += 1
+        }
 
+        a = true
+        if (a) {
+
+            let c17 = 0
+            let prevPos18 = 0
+            let prevChildLen19 = 0
+            do {
+                let match20 = escape(text, pos)
+                if (a = (match20 !== null)) {
+                    pos += match20.end - match20.start
+                    children.push(match20)
+                }
+
+                if (!a) {
+                    let match21 = range(text, pos)
+                    if (a = (match21 !== null)) {
+                        pos += match21.end - match21.start
+                        children.push(match21)
+                    }
+
+                }
+                if (!a) {
+                    let match22 = char(text, pos)
+                    if (a = (match22 !== null)) {
+                        pos += match22.end - match22.start
+                        children.push(match22)
+                    }
+
+                }
+            } while (a && ++c17);
+
+            a = c17 >= 1
             if (!a) {
-                if (a = /* char predicate */ (/* nset */ pos < text.length && !(/* char "]" */ text.charCodeAt(pos) === 93))) {
+                pos = prevPos18
+                children.length = prevChildLen19
+            }
+            if (a) {
+                if (a = /* char predicate */ (/* char "]" */ text.charCodeAt(pos) === 93)) {
                     pos += 1
                 }
 
             }
 
-        } while (a && ++c11 < Infinity);
-        a = c11 >= 1
-        if (!a) {
-            pos = prevPos12
-            children.length = prevChildLen13
+        }
+
+    }
+    if (!a) {
+        pos = prevPos15
+        children.length = prevChildLen16
+    }
+    if (a) {
+        return ({
+            name: "set",
+            start,
+            end: pos,
+            children
+        })
+    }
+    return null
+}
+exports.range = range
+function range(text, pos = 0) {
+    let start = pos
+    let a = true
+    let children = []
+    let prevPos23 = pos
+    let prevChildLen24 = children.length
+    if (a = /* char predicate */ (/* any char */ pos < text.length)) {
+        pos += 1
+    }
+
+    if (a) {
+        if (a = /* char predicate */ (/* char "-" */ text.charCodeAt(pos) === 45)) {
+            pos += 1
         }
         if (a) {
-            if (a = /* char predicate */ (/* char "]" */ text.charCodeAt(pos) === 93)) {
+            if (a = /* char predicate */ (/* any char */ pos < text.length)) {
                 pos += 1
             }
 
         }
 
     }
+    if (!a) {
+        pos = prevPos23
+        children.length = prevChildLen24
+    }
+    if (a) {
+        return ({
+            name: "range",
+            start,
+            end: pos,
+            children
+        })
+    }
+    return null
+}
+exports.char = char
+function char(text, pos = 0) {
+    let start = pos
+    let a = true
+    let children = []
+    if (a = /* char predicate */ (/* nset */ pos < text.length && !(/* char "]" */ text.charCodeAt(pos) === 93))) {
+        pos += 1
+    }
 
     if (a) {
         return ({
-            name: "set",
+            name: "char",
             start,
             end: pos,
             children
@@ -246,116 +303,104 @@ function and(text, pos = 0) {
     let start = pos
     let a = true
     let children = []
-    let c15 = 0
-    let prevPos16 = pos
-    let prevChildLen17 = children.length
+
+    let c25 = 0
+    let prevPos26 = 0
+    let prevChildLen27 = 0
     do {
-        let match18 = par(text, pos)
-        if (a = (match18 !== null)) {
-            pos += match18.end - match18.start
-            children.push(match18)
+        let prevPos28 = pos
+        let prevChildLen29 = children.length
+        let match30 = par(text, pos)
+        if (a = (match30 !== null)) {
+            pos += match30.end - match30.start
+            children.push(match30)
         }
 
         if (!a) {
-            let match19 = escape(text, pos)
-            if (a = (match19 !== null)) {
-                pos += match19.end - match19.start
-                children.push(match19)
+            let match31 = anychar(text, pos)
+            if (a = (match31 !== null)) {
+                pos += match31.end - match31.start
+                children.push(match31)
             }
 
         }
         if (!a) {
-            let match20 = str(text, pos)
-            if (a = (match20 !== null)) {
-                pos += match20.end - match20.start
-                children.push(match20)
+            let match32 = escape(text, pos)
+            if (a = (match32 !== null)) {
+                pos += match32.end - match32.start
+                children.push(match32)
             }
 
         }
         if (!a) {
-            let match21 = nset(text, pos)
-            if (a = (match21 !== null)) {
-                pos += match21.end - match21.start
-                children.push(match21)
+            let match33 = str(text, pos)
+            if (a = (match33 !== null)) {
+                pos += match33.end - match33.start
+                children.push(match33)
             }
 
         }
         if (!a) {
-            let match22 = set(text, pos)
-            if (a = (match22 !== null)) {
-                pos += match22.end - match22.start
-                children.push(match22)
+            let match34 = set(text, pos)
+            if (a = (match34 !== null)) {
+                pos += match34.end - match34.start
+                children.push(match34)
             }
 
         }
         if (!a) {
-            let match23 = ident(text, pos)
-            if (a = (match23 !== null)) {
-                pos += match23.end - match23.start
-                children.push(match23)
+            let match35 = ident(text, pos)
+            if (a = (match35 !== null)) {
+                pos += match35.end - match35.start
+                children.push(match35)
             }
 
         }
 
         if (a) {
-            let c24 = 0
-            let prevPos25 = pos
-            let prevChildLen26 = children.length
+
+            let c36 = 0
             do {
                 if (a = /* char predicate */ (/* set */ (/* char " " */ text.charCodeAt(pos) === 32 || /* char "\t" */ text.charCodeAt(pos) === 9 || /* char "\n" */ text.charCodeAt(pos) === 10))) {
                     pos += 1
                 }
+            } while (a && ++c36);
 
-            } while (a && ++c24 < Infinity);
-            a = c24 >= 0
-            if (!a) {
-                pos = prevPos25
-                children.length = prevChildLen26
-            }
+            a = true
             if (a) {
-                let c27 = 0
-                let prevPos28 = pos
-                let prevChildLen29 = children.length
-                do {
-                    let match30 = card(text, pos)
-                    if (a = (match30 !== null)) {
-                        pos += match30.end - match30.start
-                        children.push(match30)
-                    }
-
-                } while (a && ++c27 < 1);
-                a = c27 >= 0
-                if (!a) {
-                    pos = prevPos28
-                    children.length = prevChildLen29
+                let match39 = card(text, pos)
+                if (a = (match39 !== null)) {
+                    pos += match39.end - match39.start
+                    children.push(match39)
                 }
+
+                a = true
                 if (a) {
-                    let c31 = 0
-                    let prevPos32 = pos
-                    let prevChildLen33 = children.length
+
+                    let c40 = 0
                     do {
                         if (a = /* char predicate */ (/* set */ (/* char " " */ text.charCodeAt(pos) === 32 || /* char "\t" */ text.charCodeAt(pos) === 9 || /* char "\n" */ text.charCodeAt(pos) === 10))) {
                             pos += 1
                         }
+                    } while (a && ++c40);
 
-                    } while (a && ++c31 < Infinity);
-                    a = c31 >= 0
-                    if (!a) {
-                        pos = prevPos32
-                        children.length = prevChildLen33
-                    }
+                    a = true
 
                 }
 
             }
 
         }
+        if (!a) {
+            pos = prevPos28
+            children.length = prevChildLen29
+        }
+    } while (a && ++c25);
 
-    } while (a && ++c15 < Infinity);
-    a = c15 >= 1
+    a = c25 >= 1
     if (!a) {
-        pos = prevPos16
-        children.length = prevChildLen17
+        pos = prevPos26
+        children.length = prevChildLen27
     }
 
     if (a) {
@@ -373,72 +418,67 @@ function or(text, pos = 0) {
     let start = pos
     let a = true
     let children = []
-    let match34 = par(text, pos)
-    if (a = (match34 !== null)) {
-        pos += match34.end - match34.start
-        children.push(match34)
+    let prevPos43 = pos
+    let prevChildLen44 = children.length
+    let match45 = par(text, pos)
+    if (a = (match45 !== null)) {
+        pos += match45.end - match45.start
+        children.push(match45)
     }
 
     if (!a) {
-        let match35 = and(text, pos)
-        if (a = (match35 !== null)) {
-            pos += match35.end - match35.start
-            children.push(match35)
+        let match46 = and(text, pos)
+        if (a = (match46 !== null)) {
+            pos += match46.end - match46.start
+            children.push(match46)
         }
 
     }
 
     if (a) {
-        let c36 = 0
-        let prevPos37 = pos
-        let prevChildLen38 = children.length
+
+        let c47 = 0
+        let prevPos48 = 0
+        let prevChildLen49 = 0
         do {
-            let c39 = 0
-            let prevPos40 = pos
-            let prevChildLen41 = children.length
+            let prevPos50 = pos
+            let prevChildLen51 = children.length
+
+            let c52 = 0
             do {
                 if (a = /* char predicate */ (/* set */ (/* char " " */ text.charCodeAt(pos) === 32 || /* char "\t" */ text.charCodeAt(pos) === 9 || /* char "\n" */ text.charCodeAt(pos) === 10))) {
                     pos += 1
                 }
+            } while (a && ++c52);
 
-            } while (a && ++c39 < Infinity);
-            a = c39 >= 0
-            if (!a) {
-                pos = prevPos40
-                children.length = prevChildLen41
-            }
+            a = true
 
             if (a) {
                 if (a = /* char predicate */ (/* char "|" */ text.charCodeAt(pos) === 124)) {
                     pos += 1
                 }
                 if (a) {
-                    let c42 = 0
-                    let prevPos43 = pos
-                    let prevChildLen44 = children.length
+
+                    let c55 = 0
                     do {
                         if (a = /* char predicate */ (/* set */ (/* char " " */ text.charCodeAt(pos) === 32 || /* char "\t" */ text.charCodeAt(pos) === 9 || /* char "\n" */ text.charCodeAt(pos) === 10))) {
                             pos += 1
                         }
+                    } while (a && ++c55);
 
-                    } while (a && ++c42 < Infinity);
-                    a = c42 >= 0
-                    if (!a) {
-                        pos = prevPos43
-                        children.length = prevChildLen44
-                    }
+                    a = true
                     if (a) {
-                        let match45 = par(text, pos)
-                        if (a = (match45 !== null)) {
-                            pos += match45.end - match45.start
-                            children.push(match45)
+                        let match58 = par(text, pos)
+                        if (a = (match58 !== null)) {
+                            pos += match58.end - match58.start
+                            children.push(match58)
                         }
 
                         if (!a) {
-                            let match46 = and(text, pos)
-                            if (a = (match46 !== null)) {
-                                pos += match46.end - match46.start
-                                children.push(match46)
+                            let match59 = and(text, pos)
+                            if (a = (match59 !== null)) {
+                                pos += match59.end - match59.start
+                                children.push(match59)
                             }
 
                         }
@@ -448,16 +488,23 @@ function or(text, pos = 0) {
                 }
 
             }
+            if (!a) {
+                pos = prevPos50
+                children.length = prevChildLen51
+            }
+        } while (a && ++c47);
 
-        } while (a && ++c36 < Infinity);
-        a = c36 >= 1
+        a = c47 >= 1
         if (!a) {
-            pos = prevPos37
-            children.length = prevChildLen38
+            pos = prevPos48
+            children.length = prevChildLen49
         }
 
     }
-
+    if (!a) {
+        pos = prevPos43
+        children.length = prevChildLen44
+    }
     if (a) {
         return ({
             name: "or",
@@ -473,91 +520,69 @@ function par(text, pos = 0) {
     let start = pos
     let a = true
     let children = []
+    let prevPos60 = pos
+    let prevChildLen61 = children.length
     if (a = /* char predicate */ (/* char "(" */ text.charCodeAt(pos) === 40)) {
         pos += 1
     }
 
     if (a) {
-        let c47 = 0
-        let prevPos48 = pos
-        let prevChildLen49 = children.length
+
+        let c62 = 0
         do {
             if (a = /* char predicate */ (/* set */ (/* char " " */ text.charCodeAt(pos) === 32 || /* char "\t" */ text.charCodeAt(pos) === 9 || /* char "\n" */ text.charCodeAt(pos) === 10))) {
                 pos += 1
             }
+        } while (a && ++c62);
 
-        } while (a && ++c47 < Infinity);
-        a = c47 >= 0
-        if (!a) {
-            pos = prevPos48
-            children.length = prevChildLen49
-        }
+        a = true
         if (a) {
-            let match50 = or(text, pos)
-            if (a = (match50 !== null)) {
-                pos += match50.end - match50.start
-                children.push(match50)
+            let match65 = or(text, pos)
+            if (a = (match65 !== null)) {
+                pos += match65.end - match65.start
+                children.push(match65)
             }
 
             if (!a) {
-                let match51 = and(text, pos)
-                if (a = (match51 !== null)) {
-                    pos += match51.end - match51.start
-                    children.push(match51)
+                let match66 = and(text, pos)
+                if (a = (match66 !== null)) {
+                    pos += match66.end - match66.start
+                    children.push(match66)
                 }
 
             }
             if (a) {
-                let c52 = 0
-                let prevPos53 = pos
-                let prevChildLen54 = children.length
+
+                let c67 = 0
                 do {
                     if (a = /* char predicate */ (/* set */ (/* char " " */ text.charCodeAt(pos) === 32 || /* char "\t" */ text.charCodeAt(pos) === 9 || /* char "\n" */ text.charCodeAt(pos) === 10))) {
                         pos += 1
                     }
+                } while (a && ++c67);
 
-                } while (a && ++c52 < Infinity);
-                a = c52 >= 0
-                if (!a) {
-                    pos = prevPos53
-                    children.length = prevChildLen54
-                }
+                a = true
                 if (a) {
                     if (a = /* char predicate */ (/* char ")" */ text.charCodeAt(pos) === 41)) {
                         pos += 1
                     }
                     if (a) {
-                        let c55 = 0
-                        let prevPos56 = pos
-                        let prevChildLen57 = children.length
+
+                        let c70 = 0
                         do {
                             if (a = /* char predicate */ (/* set */ (/* char " " */ text.charCodeAt(pos) === 32 || /* char "\t" */ text.charCodeAt(pos) === 9 || /* char "\n" */ text.charCodeAt(pos) === 10))) {
                                 pos += 1
                             }
+                        } while (a && ++c70);
 
-                        } while (a && ++c55 < Infinity);
-                        a = c55 >= 0
-                        if (!a) {
-                            pos = prevPos56
-                            children.length = prevChildLen57
-                        }
+                        a = true
                         if (a) {
-                            let c58 = 0
-                            let prevPos59 = pos
-                            let prevChildLen60 = children.length
-                            do {
-                                let match61 = card(text, pos)
-                                if (a = (match61 !== null)) {
-                                    pos += match61.end - match61.start
-                                    children.push(match61)
-                                }
-
-                            } while (a && ++c58 < 1);
-                            a = c58 >= 0
-                            if (!a) {
-                                pos = prevPos59
-                                children.length = prevChildLen60
+                            let match73 = card(text, pos)
+                            if (a = (match73 !== null)) {
+                                pos += match73.end - match73.start
+                                children.push(match73)
                             }
+
+                            a = true
 
                         }
 
@@ -570,7 +595,10 @@ function par(text, pos = 0) {
         }
 
     }
-
+    if (!a) {
+        pos = prevPos60
+        children.length = prevChildLen61
+    }
     if (a) {
         return ({
             name: "par",
@@ -586,106 +614,94 @@ function rule(text, pos = 0) {
     let start = pos
     let a = true
     let children = []
-    let match62 = ident(text, pos)
-    if (a = (match62 !== null)) {
-        pos += match62.end - match62.start
-        children.push(match62)
+    let prevPos74 = pos
+    let prevChildLen75 = children.length
+    let match76 = ident(text, pos)
+    if (a = (match76 !== null)) {
+        pos += match76.end - match76.start
+        children.push(match76)
     }
 
     if (a) {
-        let c63 = 0
-        let prevPos64 = pos
-        let prevChildLen65 = children.length
+
+        let c77 = 0
         do {
             if (a = /* char predicate */ (/* set */ (/* char " " */ text.charCodeAt(pos) === 32 || /* char "\t" */ text.charCodeAt(pos) === 9 || /* char "\n" */ text.charCodeAt(pos) === 10))) {
                 pos += 1
             }
+        } while (a && ++c77);
 
-        } while (a && ++c63 < Infinity);
-        a = c63 >= 0
-        if (!a) {
-            pos = prevPos64
-            children.length = prevChildLen65
-        }
+        a = true
         if (a) {
             if (a = /* char predicate */ (/* char "=" */ text.charCodeAt(pos) === 61)) {
                 pos += 1
             }
             if (a) {
-                let c66 = 0
-                let prevPos67 = pos
-                let prevChildLen68 = children.length
+
+                let c80 = 0
                 do {
                     if (a = /* char predicate */ (/* set */ (/* char " " */ text.charCodeAt(pos) === 32 || /* char "\t" */ text.charCodeAt(pos) === 9 || /* char "\n" */ text.charCodeAt(pos) === 10))) {
                         pos += 1
                     }
+                } while (a && ++c80);
 
-                } while (a && ++c66 < Infinity);
-                a = c66 >= 0
-                if (!a) {
-                    pos = prevPos67
-                    children.length = prevChildLen68
-                }
+                a = true
                 if (a) {
-                    let match69 = or(text, pos)
-                    if (a = (match69 !== null)) {
-                        pos += match69.end - match69.start
-                        children.push(match69)
+                    let match83 = or(text, pos)
+                    if (a = (match83 !== null)) {
+                        pos += match83.end - match83.start
+                        children.push(match83)
                     }
 
                     if (!a) {
-                        let match70 = and(text, pos)
-                        if (a = (match70 !== null)) {
-                            pos += match70.end - match70.start
-                            children.push(match70)
+                        let match84 = and(text, pos)
+                        if (a = (match84 !== null)) {
+                            pos += match84.end - match84.start
+                            children.push(match84)
                         }
 
                     }
                     if (!a) {
-                        let match71 = par(text, pos)
-                        if (a = (match71 !== null)) {
-                            pos += match71.end - match71.start
-                            children.push(match71)
+                        let prevPos85 = pos
+                        let prevChildLen86 = children.length
+                        let match87 = par(text, pos)
+                        if (a = (match87 !== null)) {
+                            pos += match87.end - match87.start
+                            children.push(match87)
                         }
 
                         if (a) {
-                            let c72 = 0
-                            let prevPos73 = pos
-                            let prevChildLen74 = children.length
+                            let prevPos88 = pos
+                            let prevChildLen89 = children.length
+
+                            let c90 = 0
                             do {
-                                let c75 = 0
-                                let prevPos76 = pos
-                                let prevChildLen77 = children.length
-                                do {
-                                    if (a = /* char predicate */ (/* set */ (/* char " " */ text.charCodeAt(pos) === 32 || /* char "\t" */ text.charCodeAt(pos) === 9 || /* char "\n" */ text.charCodeAt(pos) === 10))) {
-                                        pos += 1
-                                    }
+                                if (a = /* char predicate */ (/* set */ (/* char " " */ text.charCodeAt(pos) === 32 || /* char "\t" */ text.charCodeAt(pos) === 9 || /* char "\n" */ text.charCodeAt(pos) === 10))) {
+                                    pos += 1
+                                }
+                            } while (a && ++c90);
 
-                                } while (a && ++c75 < Infinity);
-                                a = c75 >= 0
-                                if (!a) {
-                                    pos = prevPos76
-                                    children.length = prevChildLen77
+                            a = true
+
+                            if (a) {
+                                let match93 = card(text, pos)
+                                if (a = (match93 !== null)) {
+                                    pos += match93.end - match93.start
+                                    children.push(match93)
                                 }
 
-                                if (a) {
-                                    let match78 = card(text, pos)
-                                    if (a = (match78 !== null)) {
-                                        pos += match78.end - match78.start
-                                        children.push(match78)
-                                    }
-
-                                }
-
-                            } while (a && ++c72 < 1);
-                            a = c72 >= 0
-                            if (!a) {
-                                pos = prevPos73
-                                children.length = prevChildLen74
                             }
+                            if (!a) {
+                                pos = prevPos88
+                                children.length = prevChildLen89
+                            }
+                            a = true
 
                         }
-
+                        if (!a) {
+                            pos = prevPos85
+                            children.length = prevChildLen86
+                        }
                     }
 
                 }
@@ -695,7 +711,10 @@ function rule(text, pos = 0) {
         }
 
     }
-
+    if (!a) {
+        pos = prevPos74
+        children.length = prevChildLen75
+    }
     if (a) {
         return ({
             name: "rule",
@@ -711,46 +730,41 @@ function rules(text, pos = 0) {
     let start = pos
     let a = true
     let children = []
-    let c79 = 0
-    let prevPos80 = pos
-    let prevChildLen81 = children.length
+    let prevPos94 = pos
+    let prevChildLen95 = children.length
+
+    let c96 = 0
+    let prevPos97 = 0
+    let prevChildLen98 = 0
     do {
-        let c82 = 0
-        let prevPos83 = pos
-        let prevChildLen84 = children.length
+        let prevPos99 = pos
+        let prevChildLen100 = children.length
+
+        let c101 = 0
         do {
             if (a = /* char predicate */ (/* set */ (/* char " " */ text.charCodeAt(pos) === 32 || /* char "\t" */ text.charCodeAt(pos) === 9 || /* char "\n" */ text.charCodeAt(pos) === 10))) {
                 pos += 1
             }
+        } while (a && ++c101);
 
-        } while (a && ++c82 < Infinity);
-        a = c82 >= 0
-        if (!a) {
-            pos = prevPos83
-            children.length = prevChildLen84
-        }
+        a = true
 
         if (a) {
-            let match85 = rule(text, pos)
-            if (a = (match85 !== null)) {
-                pos += match85.end - match85.start
-                children.push(match85)
+            let match104 = rule(text, pos)
+            if (a = (match104 !== null)) {
+                pos += match104.end - match104.start
+                children.push(match104)
             }
             if (a) {
-                let c86 = 0
-                let prevPos87 = pos
-                let prevChildLen88 = children.length
+
+                let c105 = 0
                 do {
                     if (a = /* char predicate */ (/* set */ (/* char " " */ text.charCodeAt(pos) === 32 || /* char "\t" */ text.charCodeAt(pos) === 9 || /* char "\n" */ text.charCodeAt(pos) === 10))) {
                         pos += 1
                     }
+                } while (a && ++c105);
 
-                } while (a && ++c86 < Infinity);
-                a = c86 >= 0
-                if (!a) {
-                    pos = prevPos87
-                    children.length = prevChildLen88
-                }
+                a = true
                 if (a) {
                     if (a = /* char predicate */ (/* char ";" */ text.charCodeAt(pos) === 59)) {
                         pos += 1
@@ -761,32 +775,34 @@ function rules(text, pos = 0) {
             }
 
         }
+        if (!a) {
+            pos = prevPos99
+            children.length = prevChildLen100
+        }
+    } while (a && ++c96);
 
-    } while (a && ++c79 < Infinity);
-    a = c79 >= 1
+    a = c96 >= 1
     if (!a) {
-        pos = prevPos80
-        children.length = prevChildLen81
+        pos = prevPos97
+        children.length = prevChildLen98
     }
 
     if (a) {
-        let c89 = 0
-        let prevPos90 = pos
-        let prevChildLen91 = children.length
+
+        let c108 = 0
         do {
             if (a = /* char predicate */ (/* set */ (/* char " " */ text.charCodeAt(pos) === 32 || /* char "\t" */ text.charCodeAt(pos) === 9 || /* char "\n" */ text.charCodeAt(pos) === 10))) {
                 pos += 1
             }
+        } while (a && ++c108);
 
-        } while (a && ++c89 < Infinity);
-        a = c89 >= 0
-        if (!a) {
-            pos = prevPos90
-            children.length = prevChildLen91
-        }
+        a = true
 
     }
-
+    if (!a) {
+        pos = prevPos94
+        children.length = prevChildLen95
+    }
     if (a) {
         return ({
             name: "rules",

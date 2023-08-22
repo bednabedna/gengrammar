@@ -152,6 +152,10 @@ if (a = (input.charCodeAt(pos) === 33 || input.charCodeAt(pos) === 34)) {
 ```
 To emulate the concatenation of predicates `A B C`, the subsequent code is generated:
 ```js
+// uniquely named variable
+let prevPos123 = pos
+// uniquely named variable
+let prevChildLen123 = children.length
 A
 if (a) {
     B
@@ -163,6 +167,9 @@ if (a) {
     // accept
 } else {
     // reject
+    // We need to rollback all accepted predicates (for example A and B accepted but C rejected)
+    pos = prevPos123
+    children.length = prevChildLen123
 }
 ```
 To simulate an "or" operation among the predicates `A | B | C`, we generate the following code:
@@ -178,6 +185,7 @@ if (a) {
     // accept
 } else {
     // reject
+    // we don't need to rollback changes because the predicates A, B, C already handle everything
 }
 
 ```
@@ -194,12 +202,12 @@ do {
 } while (a && c123++ < max);
 a = c123 >= min
 if (!a) {
-    // here the loop has failed
+    // here the loop has failed, we rollback accepted predicates
     pos = prevPos123
     children.length = prevChildLen123
 }
 ```
-Given the expections on predicates to reset the positions, we can expand any of the predicates in the example code and all the assumptions should hold. For additional instances of predicates, you can explore the generated code within the `/generated` directory. 
+Given the expections on predicates to reset the positions, we can replace A, B, C with any of the predicates in the example code and all the assumptions should hold. For additional instances of predicates, you can explore the generated code within the `/generated` directory. 
 
 ## Concluding Remarks on the Code
 The presented code exemplifies a personal, compact coding project that I undertook to delve into an intriguing concept. It's worth noting that this endeavor is purely exploratory in nature. It lacks the optimization that comes with algorithmic refinement and hasn't undergone rigorous testing. It's my intention that this project isn't misconstrued as a representation of my professional coding standards. Ordinarily, I adhere to established code conventions and rigorously test my code for robustness.
@@ -207,6 +215,3 @@ The presented code exemplifies a personal, compact coding project that I underto
 Should you wish to explore my other GitHub projects, I welcome your curiosity. Nonetheless, I'd like to reiterate a caveat: while you're welcome to peruse my projects, including those shared here, it's important to consider that certain projects were developed several years ago. Furthermore, certain projects were made available primarily for interview purposes. The majority of my code is either private or not suitable for public presentation.
 
 Engaging in this project was immensely enjoyable, and I believe it reflects my genuine enthusiasm for delving into diverse computer science concepts during my leisure time.
-
-## Todos (not comprehensive)
-Implement ranges in sets (e.g [a-z0-9]) and "." special character for the match compilation, introduce loop special cases and optimizazions, handle pos reset in some edge cases, add tests.
